@@ -1,7 +1,7 @@
 
 # News Bias Coreference Resolution API
 
-This project implements a **coreference resolution pipeline** for news articles using **spaCy**, **Coreferee**, and **FastAPI**. It detects entities, resolves pronouns, merges chains of related mentions, and outputs both **resolved text** and **coreference chains**.
+This project implements a **coreference resolution pipeline** for news articles using **spaCy**, **Coreferee**, and **FastAPI**. It detects entities, resolves pronouns, merges chains of related mentions, and output s both **resolved text** and **coreference chains**.
 
 ---
 
