@@ -1,0 +1,173 @@
+
+# News Bias Coreference Resolution API
+
+This project implements a **coreference resolution pipeline** for news articles using **spaCy**, **Coreferee**, and **FastAPI**. It detects entities, resolves pronouns, merges chains of related mentions, and outputs both **resolved text** and **coreference chains**.
+
+---
+
+
+## Technologies
+
+* Python 3.10+
+* FastAPI 0.95.2
+* Uvicorn 0.23.2
+* spaCy 3.5+ (`en_core_web_lg`)
+* Coreferee 1.4.1
+* Pydantic 1.10.13
+
+---
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repo-url>
+cd <repo-folder>
+```
+
+---
+
+### 2. Create & activate a virtual environment
+
+```bash
+python -m venv coref_venv
+# Windows
+coref_venv\Scripts\activate
+# Linux / macOS
+source coref_venv/bin/activate
+```
+
+---
+
+### 3. Install dependencies
+
+> Make sure FastAPI & Uvicorn versions are correct. If not included in `requirements.txt`, install them first.
+
+```bash
+pip install fastapi==0.95.2 uvicorn==0.23.2
+pip install -r requirements.txt
+```
+
+---
+
+### 4. Download & verify spaCy model
+
+Check if `en_core_web_lg` is installed:
+
+```bash
+python -m spacy validate
+python -c "import spacy; nlp = spacy.load('en_core_web_lg'); print('Model loaded successfully')"
+```
+
+If the model is missing, download manually:
+
+```bash
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.5.0/en_core_web_lg-3.5.0-py3-none-any.whl
+```
+
+---
+
+### 5. Verify Pydantic & Python inside venv
+
+Run the following inside the venv:
+
+```bash
+# Check python executable
+where python  # Windows
+which python  # Linux/macOS
+
+# Check Pydantic version
+python -c "import pydantic, sys; print('pydantic version:', pydantic.__version__); print('pydantic file:', pydantic.__file__); print('python exe:', sys.executable)"
+```
+
+**Correct Output Example:**
+
+```
+pydantic version: 1.10.13
+pydantic file: ...\coref_venv\lib\site-packages\pydantic\__init__.cp310-win_amd64.pyd
+python exe: ...\coref_venv\Scripts\python.exe
+```
+
+> If output is incorrect, follow the troubleshooting steps below.
+
+---
+
+### 6. Troubleshooting Pydantic
+
+1. Uninstall conflicting packages:
+
+```bash
+python -m pip uninstall -y pydantic pydantic-core annotated-types typing-inspection
+```
+
+2. Remove residual files:
+
+```powershell
+$sp = ".\coref_venv\Lib\site-packages"
+Remove-Item -Recurse -Force "$sp\pydantic" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$sp\pydantic-*.dist-info" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$sp\pydantic_core*" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$sp\annotated_types*" -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force "$sp\typing_inspection*" -ErrorAction SilentlyContinue
+```
+
+3. Reinstall specific Pydantic version:
+
+```bash
+python -m pip install --no-cache-dir --force-reinstall "pydantic==1.10.13"
+```
+
+4. Verify again:
+
+```bash
+python -c "import pydantic, sys; print('pydantic version:', pydantic.__version__); print('pydantic file:', pydantic.__file__); print('python exe:', sys.executable)"
+```
+
+---
+
+## Running the API
+
+Start FastAPI server with Uvicorn:
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+* API documentation is available at: `http://127.0.0.1:8000/docs`
+* Use `/resolve` endpoint to send news text and receive coreference chains + resolved text
+
+---
+
+## Example Usage
+
+```python
+from app.main import resolve_text, build_nlp
+
+nlp = build_nlp()
+text = "PM Modi said he will ensure that the nation's wealth is safe. He will work hard."
+
+chains, resolved_text = resolve_text(text, nlp)
+print("Chains:", chains)
+print("Resolved text:", resolved_text)
+```
+
+---
+
+## Notes
+
+* This API is part of the **News Bias Analysis** pipeline.
+* It ensures pronouns and references in news articles are resolved correctly to analyze bias more accurately.
+* Special handling for narrator pronouns and quoted speech is implemented.
+* Generic references like `every Indian` or `all MPs` are not incorrectly replaced.
+
+---
+
+## Contributing
+
+* Fork the repo
+* Create a branch for your feature
+* Submit a pull request
+
+---
+
